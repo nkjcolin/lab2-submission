@@ -1,0 +1,80 @@
+services:
+  analysis:
+    build:
+      context: .
+      dockerfile: analysis/Dockerfile
+    environment:
+      ANALYSIS_INPUT: /input/twitter_combined.txt
+      DB_PATH: /data/state/users.db
+      JOB_DIR: /data/state/jobs
+      JOB_POLL_SECONDS: "${JOB_POLL_SECONDS:-1}"
+      RESULT_DIR: /data/results-root/published
+      SPARK_MASTER: "${SPARK_MASTER:-local[*]}"
+      SPARK_LOCAL_IP: 127.0.0.1
+    volumes:
+      - type: bind
+        source: ${UPLOAD_DIR:-./upload}
+        target: /input
+        read_only: true
+      - type: bind
+        source: ${RESULTS_DIR:-./data/results}
+        target: /data/results-root
+      - type: bind
+        source: ${STATE_DIR:-./data/state}
+        target: /data/state
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      ANALYSIS_API_TOKEN: "${ANALYSIS_API_TOKEN:-local-development-only}"
+      RESULT_DIR: /data/results-root/published
+      DB_PATH: /data/state/users.db
+      JOB_DIR: /data/state/jobs
+    volumes:
+      - type: bind
+        source: ${RESULTS_DIR:-./data/results}
+        target: /data/results-root
+        read_only: true
+      - type: bind
+        source: ${STATE_DIR:-./data/state}
+        target: /data/state
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=2).read()"
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      ANALYSIS_API_TOKEN: "${ANALYSIS_API_TOKEN:-local-development-only}"
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - --quiet
+        - --output-document=/dev/null
+        - http://127.0.0.1/api/health
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped

@@ -1,0 +1,9 @@
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+*.tfplan
+# deploy.sh writes the final saved plan using this extensionless filename.
+tfplan
+crash.log
+crash.*.log

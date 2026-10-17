@@ -1,0 +1,28 @@
+# Local configuration
+.env
+/codex.docker.config.toml
+
+# Supplied input and generated state
+/twitter_combined.txt
+/upload/twitter_combined.txt
+/data/results/
+/data/state/
+
+# Obsolete AWS preflight evidence from the superseded EMR deployment attempt
+/evidence/aws-preflight-2026-10-13.txt
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+
+# Frontend
+node_modules/
+dist/
+
+# Editors and operating systems
+.DS_Store
+.idea/
+.vscode/
+

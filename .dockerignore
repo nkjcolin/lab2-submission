@@ -1,0 +1,17 @@
+.git
+.gitignore
+.env
+.DS_Store
+
+# Never send the supplied data or generated state to an image build.
+twitter_combined.txt
+upload/
+data/
+
+# Local build and test artifacts
+**/__pycache__/
+**/*.py[cod]
+**/.pytest_cache/
+**/node_modules/
+**/dist/
+

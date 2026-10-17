@@ -1,0 +1,17 @@
+aws_profile = "colin"
+aws_region  = "ap-southeast-2"
+
+project_name = "cs5224-lab2"
+image_tag    = "v1"
+
+eb_instance_type  = "t3.micro"
+eb_root_volume_gib = 12
+
+# Tested allocation for this PySpark job (1 vCPU and 4 GiB).
+analysis_task_cpu    = 1024
+analysis_task_memory = 4096
+
+viewer_username = "labadmin"
+
+# Set true only for the final terraform destroy of non-empty S3/ECR resources.
+force_destroy = false
